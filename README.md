@@ -1,58 +1,81 @@
-# React Chrome Extension Boilerplate
+# What I learned
 
-Boilerplate for building Chrome Extensions in React and TypeScript using a simple Webpack build process.
+1. Added interpolation to the css and sql functions.
 
-## Getting Started
+## Todos
 
-```bash
-git clone https://github.com/aadilmallick/webpack-chrome-extension-boilerplate.git my-extension
-cd my-extension
-rm -rf .git
-git init
-git add .
-git commit -m "First commit"
-npm i
-code .
+- [ ] Add keepawake
+- [ ] Add delete comment functionality
+- [ ] Refactor to use chrome messaging wrapper
+
+## Instagram things
+
+The instagram posts look like these:
+
+```html
+<div
+  data-bloks-name="bk.components.Flexbox"
+  tabindex="0"
+  role="button"
+  aria-label="Image of Post"
+  class="wbloks_1"
+  style="pointer-events: none;"
+>
+  <img
+    data-bloks-name="bk.components.Image"
+    alt=""
+    class="wbloks_1"
+    src="https://scontent-iad3-2.cdninstagram.com/v/t51.2885-15/494026867_18056520098236002_8459025033943575885_n.jpg?stp=c0.140.1125.1125a_dst-jpg_e35_s240x240_tt6&amp;efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0uaW1hZ2VfdXJsZ2VuLjExMjV4MTQwNi5zZHIuZjc1NzYxLmRlZmF1bHRfaW1hZ2UifQ&amp;_nc_ht=scontent-iad3-2.cdninstagram.com&amp;_nc_cat=106&amp;_nc_oc=Q6cZ2QGgEHekH95iM2KK17lIPmr5rgIBbWygWKJdPTa0tSuissoAleirYElpa97jtySwfZo&amp;_nc_ohc=4d5kPKIHoE8Q7kNvwFcGfhV&amp;_nc_gid=NB1rS8ftbPPRdxHa4D55_A&amp;edm=APs17CUBAAAA&amp;ccb=7-5&amp;ig_cache_key=MzYyMTUzOTExNDI0NDM2OTM0OQ%3D%3D.3-ccb7-5&amp;oh=00_AfJlkHWgQNkqjz3p3YlBUZF56827SJ0TG9NkVrYahnSVoQ&amp;oe=6830E007&amp;_nc_sid=10d13b"
+    style="height: 100%; flex-grow: 1; object-fit: cover; overflow: hidden;"
+  />
+</div>
 ```
 
-1. `npm i` to install dependancies
-2. `npm start` to start running the fast development mode Webpack build process that bundle files into the `dist` folder
-3. `npm i --save-dev <package_name>` to install new packages
+This is the unlike button HTML
 
-### Loading The Chrome Extension
-
-1. Open Chrome and navigate to `chrome://extensions/`
-2. Toggle on `Developer mode` in the top right corner
-3. Click `Load unpacked`
-4. Select the entire `dist` folder
-
-### Production Build
-
-1. `npm run build` to generate a minimized production build in the `dist` folder
-2. ZIP the entire `dist` folder (e.g. `dist.zip`)
-3. Publish the ZIP file on the Chrome Web Store Developer Dashboard!
-
-### Initial Steps
-
-1. `git init` to start a new git repo for tracking your changes, do an initial base commit with all the default files
-2. Update `package.json`, important fields include `author`, `version`, `name` and `description`
-3. Update `manifest.json`, important fields include `version`, `name` and `description`
-
-### Default Boilerplate Notes
-
-- Folders get flattened, static references to images from HTML do not need to be relative (i.e. `icon.png` instead of `../static/icon.png`)
-- Importing local ts/tsx/css files should be relative, since Webpack will build a dependancy graph using these paths
-- Update the manifest file as per usual for chrome related permissions, references to files in here should also be flattened and not be relative
-
-```tsx
-const App: React.FC<{}> = () => {
-  return (
-    <div>
-      <p className="text-white text-2xl underline font-black">Hello world</p>
-      {/* this is how you refer to assets: they live in the static folder, and you refer to them
-      absolutely. */}
-      <img src="icon.png" />
+```html
+<div
+  data-bloks-name="bk.components.Flexbox"
+  tabindex="0"
+  role="button"
+  aria-label="Unlike"
+  class="wbloks_1"
+  style="pointer-events: auto; width: auto; min-height: 32px; cursor: pointer; -webkit-tap-highlight-color: transparent; align-items: center; justify-content: center;"
+>
+  <div
+    data-bloks-name="bk.components.Flexbox"
+    class="wbloks_1"
+    style="pointer-events: none; width: auto; margin: 5px 16px; align-items: center; justify-content: center;"
+  >
+    <div
+      data-bloks-name="bk.components.RichText"
+      dir="auto"
+      class="wbloks_1"
+      style="line-height: 1.3; display: block; overflow: hidden;"
+    >
+      <span
+        data-bloks-name="bk.components.TextSpan"
+        style="color: rgb(237, 73, 86); font-weight: 700; display: inline; font-size: 14px; white-space: pre-wrap; overflow-wrap: break-word;"
+        >Unlike</span
+      >
     </div>
-  );
-};
+  </div>
+  <div
+    data-bloks-name="bk.components.BoxDecoration"
+    class="wbloks_8"
+    style="background: rgba(0, 0, 0, 0);"
+  ></div>
+</div>
+```
+
+Scrollable posts container:
+
+```html
+<div
+  data-bloks-name="bk.components.Collection"
+  class="wbloks_1
+wbloks_95 wbloks_93"
+  style="flex-grow: 1; display: block; pointe
+r-events: auto;"
+></div>
 ```

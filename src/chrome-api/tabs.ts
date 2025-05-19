@@ -20,13 +20,21 @@ export default class Tabs {
   static async getCurrentTab() {
     const [tab] = await chrome.tabs.query({
       active: true,
-      lastFocusedWindow: true,
+      currentWindow: true,
     });
     if (!tab) {
-      return await chrome.tabs.query({
+      const [thatTab] = await chrome.tabs.query({
         highlighted: true,
-        lastFocusedWindow: true,
+        currentWindow: true,
       });
+      if (!thatTab) {
+        const [lastFocusedTab] = await chrome.tabs.query({
+          lastFocusedWindow: true,
+          highlighted: true,
+        });
+        return lastFocusedTab;
+      }
+      return thatTab;
     }
     return tab;
   }
