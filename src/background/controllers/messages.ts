@@ -9,6 +9,13 @@ export const logChannel = new MessagesOneWay<
   undefined
 >("logChannel");
 
+export const deleteLikesChannel = new MessagesOneWay<
+  undefined,
+  {
+    status: "started" | "error";
+  }
+>("deleteLikesChannel");
+
 export function logToBackground(sender: "popup" | "offscreen", message: any) {
   console.log(`in ${sender}:`, message);
   logChannel.sendP2P({

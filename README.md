@@ -8,6 +8,26 @@
 - [ ] Add delete comment functionality
 - [ ] Refactor to use chrome messaging wrapper
 
+## What I learned
+
+Messaging between content scripts and extension processes is a tricky thing, but here are the basic rules to use:
+
+1. Ping content script from extension.
+
+```ts
+const loaded = await MessagesModel.getContentScriptLoaded(tabId);
+```
+
+2. Receive ping from extension in content script, making sure all other message listeners are registered before this, so stuff like mounting react components should already be done
+
+```ts
+// before this mount react component, set up listener, etc.
+
+MessagesModel.receivePingFromBackground().then(() => {
+  main();
+});
+```
+
 ## Instagram things
 
 The instagram posts look like these:

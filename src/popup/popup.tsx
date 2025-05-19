@@ -4,6 +4,8 @@ import "../styles/globals.css";
 import "./popup.css";
 import { Button } from "@/components/ui/button";
 import Tabs, { TabModel } from "../chrome-api/tabs";
+import { deleteLikesChannel } from "../background/controllers/messages";
+import { MessagesModel } from "../chrome-api/messages";
 
 const App: React.FC<{}> = () => {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -32,15 +34,43 @@ const App: React.FC<{}> = () => {
       const tabModel = await handleCurrentTab();
       if (!tabModel) return;
       setIsDeleting(true);
-      setStatus("Starting deletion process...");
-
-      // Check if we're on the correct page
 
       // Send message to content script to start deletion
       const tabId = tabModel.tab!.id!;
-      await chrome.tabs.sendMessage(tabId, { action: "deleteLikes" });
-      setStatus("Deletion process started!");
+      // await chrome.tabs.sendMessage(tabId, { action: "deleteLikes" });
+      // const response = await deleteLikesChannel.sendP2CAsyncWithPing(
+      //   tabId,
+      //   undefined
+      // );
+      const loaded = await MessagesModel.getContentScriptLoaded(tabId);
+      console.log("Loaded", loaded);
+      if (!loaded) {
+        setStatus("Error: No response from content script.");
+        return;
+      }
+
+      const delay = (ms: number) =>
+        new Promise((resolve) => setTimeout(resolve, ms));
+      await delay(1000); // to wait for component to mount.
+      const response = await deleteLikesChannel.sendP2CAsync(tabId, undefined);
+      console.log("Response", response);
+      if (!response) {
+        setStatus("Error: No response from content script.");
+        return;
+      }
+      switch (response.status) {
+        case "error":
+          setStatus("An error occurred!");
+          break;
+        case "started":
+          setStatus("Deletion process started!");
+          break;
+        default:
+          setStatus("Unknown status");
+          break;
+      }
     } catch (error) {
+      console.error("Error", error);
       setStatus(
         `Error: ${
           error instanceof Error ? error.message : "Unknown error occurred"
@@ -61,7 +91,7 @@ const App: React.FC<{}> = () => {
       <Button
         onClick={handleDeleteLikes}
         disabled={isDeleting}
-        className="w-full bg-red-600 hover:bg-red-700 text-white"
+        className="w-full bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isDeleting ? "Deleting..." : "Delete All Likes"}
       </Button>

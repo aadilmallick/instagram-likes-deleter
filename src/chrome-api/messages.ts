@@ -102,6 +102,23 @@ export class MessagesOneWay<PayloadType = undefined, ResponseType = undefined> {
     };
     this.listener = listener;
     chrome.runtime.onMessage.addListener(this.listener);
+    return listener;
+  }
+
+  listenSync(callback: (payload: PayloadType) => ResponseType) {
+    const listener: Listener = (
+      message: PayloadType & { type: string },
+      sender: any,
+      sendResponse: any
+    ) => {
+      if (message.type === this.channel) {
+        const response = callback(message);
+        sendResponse(response);
+      }
+    };
+    this.listener = listener;
+    chrome.runtime.onMessage.addListener(this.listener);
+    return listener;
   }
 
   static listenToMessages(
@@ -130,9 +147,14 @@ export class MessagesOneWay<PayloadType = undefined, ResponseType = undefined> {
     };
     this.listener = listener;
     chrome.runtime.onMessage.addListener(this.listener);
+    return listener;
   }
 
-  removeListener() {
+  removeListener(cb?: Listener) {
+    if (cb) {
+      chrome.runtime.onMessage.removeListener(cb);
+      return;
+    }
     if (this.listener) {
       chrome.runtime.onMessage.removeListener(this.listener);
     }
@@ -156,7 +178,7 @@ export class MessagesOneWay<PayloadType = undefined, ResponseType = undefined> {
 export class MessagesModel {
   private static pingContentScript(
     tabId: number,
-    maxRetries = 10,
+    maxRetries = 15,
     interval = 500
   ): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -184,10 +206,13 @@ export class MessagesModel {
   }
 
   static receivePingFromBackground() {
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      if (message.type === "PING") {
-        sendResponse({ status: "PONG" });
-      }
+    return new Promise<void>((res, rej) => {
+      chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        if (message.type === "PING") {
+          sendResponse({ status: "PONG" });
+          res();
+        }
+      });
     });
   }
 
@@ -227,6 +252,16 @@ export class MessagesModel {
         return;
       }
       optionsOrCb.errorCb?.();
+    }
+  }
+
+  static async getContentScriptLoaded(tabId: number) {
+    try {
+      const message = await this.pingContentScript(tabId);
+      return true;
+    } catch (error) {
+      console.error("Error pinging content script", error);
+      return false;
     }
   }
 }

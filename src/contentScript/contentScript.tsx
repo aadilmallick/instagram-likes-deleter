@@ -3,6 +3,8 @@
 import React, { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { css, DOM } from "../utils/Dom";
+import { deleteLikesChannel } from "../background/controllers/messages";
+import { MessagesModel } from "../chrome-api/messages";
 
 const CONTENT_SCRIPT_ROOT_ID = "instagram-likes-deleter-root";
 
@@ -33,8 +35,6 @@ const styles = css`
     }
   }
 `;
-
-// const stylesTag = DOM.addStyleTag(styles);
 
 const StatusOverlay: React.FC<{ message: string }> = ({ message }) => {
   if (message === "") {
@@ -72,12 +72,19 @@ const App = () => {
 
   useEffect(() => {
     // Listen for messages from the popup
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      if (message.action === "deleteLikes") {
-        deleteLikes();
-        sendResponse({ status: "started" });
-      }
+    const listener = deleteLikesChannel.listenAsync(async (_payload) => {
+      deleteLikes();
+      return { status: "started" };
     });
+    // chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    //   if (message.action === "deleteLikes") {
+    //     deleteLikes();
+    //     sendResponse({ status: "started" });
+    //   }
+    // });
+    return () => {
+      deleteLikesChannel.removeListener(listener);
+    };
   }, []);
 
   const deleteLikes = async () => {
@@ -97,18 +104,25 @@ const App = () => {
       // Function to find and click the unlike button
       const findAndClickUnlike = async () => {
         let selectedCount = 0;
-        const unlikeButtons = Array.from(
-          document.querySelectorAll(selectorMap.postsSelector)
-        ) as HTMLButtonElement[];
-        unlikeButtons.forEach((button) => {
+        const unlikeButtons = document.querySelectorAll<HTMLButtonElement>(
+          selectorMap.postsSelector
+        );
+
+        unlikeButtons.forEach(async (button) => {
           // Don't click the button if it's already selected
-          if (button.dataset["selected"] === "true") {
+          // if (button.dataset["selected"] === "true") {
+          //   return;
+          // }
+          if (button.getAttribute("selected") === "true") {
             return;
           }
+          await delay(100);
           button.click();
-          button.dataset["selected"] = "true";
+          button.setAttribute("selected", "true");
+          // button.dataset["selected"] = "true";
           selectedCount++;
         });
+        console.log(unlikeButtons);
         scrollToLoadMore();
         await delay(ROUND_DELAY);
         return selectedCount;
@@ -179,6 +193,7 @@ const App = () => {
         setStatus("");
       }, 2000);
     } catch (error) {
+      console.error("Error deleting likes", error);
       setStatus(
         `Error: ${
           error instanceof Error ? error.message : "Unknown error occurred"
@@ -190,9 +205,21 @@ const App = () => {
   return status ? <StatusOverlay message={status} /> : null;
 };
 
-// Create and inject the status overlay container
-const container = document.createElement("div");
-container.id = CONTENT_SCRIPT_ROOT_ID;
-document.body.appendChild(container);
-const root = createRoot(container);
-root.render(<App />);
+async function main() {
+  console.log("Received ping from process");
+  // Create and inject the status overlay container
+
+  const container = document.createElement("div");
+  container.id = CONTENT_SCRIPT_ROOT_ID;
+  const root = createRoot(container);
+  root.render(<App />);
+  document.body.appendChild(container);
+
+  await MessagesModel.receivePingFromBackground();
+  const stylesTag = DOM.addStyleTag(styles);
+}
+
+main();
+// .then(() => {
+//   main();
+// });
