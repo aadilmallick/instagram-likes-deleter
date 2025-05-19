@@ -1,0 +1,25 @@
+name: Make and Publish to Github
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*" # Matches tag versions like v1.0.0, v2.1.2, etc.
+
+jobs:
+  build-on-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 23
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: chrome-extension
+          path: dist

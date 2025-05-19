@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "target": "ESNext",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "paths": {
+      "@/*": ["./src/shadcn/*"]
+    },
+    "strict": true,
+    "keyofStringsOnly": false
+  }
+}
