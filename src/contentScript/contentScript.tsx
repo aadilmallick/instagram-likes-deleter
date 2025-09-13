@@ -45,23 +45,18 @@ const StatusOverlay: React.FC<{ message: string }> = ({ message }) => {
 
 const selectorMap = {
   getSelectPostsButton: () => {
-    const divs = [...DOM.$$(`div[tabindex="0"][role="button"]:has(> span)`)];
-    const selectPostsButton = divs.find(
-      (div) => div.textContent?.toLowerCase() === "select"
+    const buttons = [...DOM.$$('button, [role="button"]')];
+    const selectPostsButton = buttons.find(
+      (button) => button.textContent?.toLowerCase().trim() === "select"
     );
     return selectPostsButton;
   },
   getUnlikeButton: () => {
-    const divs = [
-      ...DOM.$$(
-        `div[data-bloks-name="bk.components.Flexbox"][role="button"][aria-label="Unlike"][style="pointer-events: auto; width: auto; min-height: 32px; cursor: pointer; -webkit-tap-highlight-color: transparent; align-items: center; justify-content: center;"]:has(span)`
-      ),
-    ];
-    const divButton = divs.find((div) => {
-      const span = div.querySelector("span");
-      return span?.textContent?.toLowerCase() === "unlike";
-    });
-    return divButton;
+    const buttons = [...DOM.$$('button, [role="button"]')];
+    const unlikeButton = buttons.find(
+      (button) => button.textContent?.toLowerCase().trim() === "unlike"
+    );
+    return unlikeButton;
   },
   postsContainerSelector: `div[data-bloks-name="bk.components.Collection"]`,
   postsSelector: `div[aria-label="Image of Post"][tabindex="0"][role="button"]:has(> img)`,
